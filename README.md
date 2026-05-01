@@ -12,6 +12,7 @@ Reddit 帖子监控工具，支持 Telegram 通知和翻译功能。
 - 支持翻译（需安装 `trans` 命令）
 - SQLite 本地历史记录
 - [ ] AI 数字人朗读
+- [ ] 其他平台（v2ex,producthunt,github trending .etc）
 
 ## 依赖
 
