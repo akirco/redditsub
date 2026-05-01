@@ -70,6 +70,7 @@ def reddit(subreddit: str, limit: int = 20, sort: str = "hot") -> Union[List[Dic
                         "score": post_data.get("score", 0),
                         "num_comments": post_data.get("num_comments", 0),
                         "author": post_data.get("author", "unknown"),
+                        "link_flair_text": post_data.get("link_flair_text", ""),
                         "created_utc": datetime.fromtimestamp(
                             post_data.get("created_utc", 0), tz=timezone.utc
                         ).isoformat(),
@@ -225,7 +226,14 @@ class RedditMonitor:
         text_lower = text.lower()
         return any(kw.lower() in text_lower for kw in keywords)
 
-    def process_submissions(self, subreddit_name: str, keywords: Optional[List[str]], category: str = "new") -> None:
+    def check_flair(self, flair_text: str, filter_list: Optional[List[str]]) -> bool:
+        if not filter_list:
+            return True
+        if not flair_text:
+            return False
+        return flair_text in filter_list
+
+    def process_submissions(self, subreddit_name: str, keywords: Optional[List[str]], category: str = "new", link_flair_filter: Optional[List[str]] = None) -> None:
         logger.info(f"正在检查 r/{subreddit_name} ({category})...")
         try:
             posts = reddit(subreddit_name, limit=20, sort=category)
@@ -247,7 +255,11 @@ class RedditMonitor:
                 if self.is_post_processed(post_id):
                     continue
 
-                if self.check_keywords(post.get("title", ""), keywords):
+                if not self.check_keywords(post.get("title", ""), keywords):
+                    continue
+
+                if not self.check_flair(post.get("link_flair_text", ""), link_flair_filter):
+                    continue
                     enable_trans = self.config["settings"].get("enable_translation", False)
                     if enable_trans:
                         target_lang = self.config["settings"].get("translation_target_lang", "zh-CN")
@@ -290,6 +302,7 @@ class RedditMonitor:
                         sub["subreddit"],
                         sub.get("keywords", []),
                         sub.get("category", "new"),
+                        sub.get("link_flair_filter", []),
                     )
                     delay = random.randint(MIN_DELAY, MAX_DELAY)
                     logger.info(f"处理完 r/{sub['subreddit']}，随机延迟 {delay} 秒...")
