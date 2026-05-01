@@ -39,6 +39,7 @@ Reddit 帖子监控工具，支持 Telegram 通知和翻译功能。
     {
       "subreddit": "commandline",
       "keywords": [],
+      "link_flair_filter": [],
       "category": "new"
     }
   ]
@@ -52,9 +53,10 @@ Reddit 帖子监控工具，支持 Telegram 通知和翻译功能。
 | `check_interval_seconds`  | 检查间隔（秒），默认 6 小时             |
 | `max_history_records`     | 历史记录最大条数                        |
 | `enable_translation`      | 是否启用翻译                            |
-| `translation_target_lang` | 翻译目标语言                            |
+| `translation_target_lang`  | 翻译目标语言                            |
 | `subreddit`               | 子版块名称                              |
 | `keywords`                | 关键词列表，为空则匹配所有              |
+| `link_flair_filter`        | 帖子标签过滤列表，为空则匹配所有       |
 | `category`                | 排序方式：`new`、`hot`、`top`、`rising` |
 
 > 详细类型去找reddit json api

@@ -119,6 +119,7 @@ DEFAULT_CONFIG = {
         {
             "subreddit": "ArtificialInteligence",
             "keywords": [],
+            "link_flair_filter": [],
             "category": "new"
         }
     ]

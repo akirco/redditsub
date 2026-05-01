@@ -35,6 +35,7 @@ On first run, a default config file will be created at `~/.config/redditsub/conf
     {
       "subreddit": "commandline",
       "keywords": [],
+      "link_flair_filter": [],
       "category": "new"
     }
   ]
@@ -51,6 +52,7 @@ On first run, a default config file will be created at `~/.config/redditsub/conf
 | `translation_target_lang` | Target language for translation |
 | `subreddit` | Subreddit name |
 | `keywords` | Keyword list, empty means match all |
+| `link_flair_filter` | Post flair filter list, empty means match all |
 | `category` | Sort method: `new`, `hot`, `top`, `rising` |
 
 ## Usage
