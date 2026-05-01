@@ -44,7 +44,9 @@ def reddit(subreddit: str, limit: int = 20, sort: str = "hot") -> Union[List[Dic
     url = f"https://www.reddit.com/r/{subreddit}/{sort}.json?limit={limit}"
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+        "Accept": "application/json",
+        "Accept-Language": "en-US,en;q=0.9",
     }
 
     try:
@@ -247,6 +249,7 @@ class RedditMonitor:
                 return
 
             posts_list: List[Dict[str, Any]] = posts
+            logger.info(f"获取到 {len(posts_list)} 条帖子")
 
             for post in posts_list:
                 post_id = post.get("id")
@@ -254,33 +257,40 @@ class RedditMonitor:
                     continue
 
                 if self.is_post_processed(post_id):
+                    logger.info(f"跳过已处理: {post_id}")
                     continue
 
                 if not self.check_keywords(post.get("title", ""), keywords):
+                    logger.info(f"关键词不匹配: {post.get('title')[:30]}") # type: ignore
                     continue
 
                 if not self.check_flair(post.get("link_flair_text", ""), link_flair_filter):
+                    logger.info(f"flair不匹配: {post.get('link_flair_text')}")
                     continue
-                    enable_trans = self.config["settings"].get("enable_translation", False)
-                    if enable_trans:
-                        target_lang = self.config["settings"].get("translation_target_lang", "zh-CN")
-                        title_to_show = self.translate_text(post["title"], target_lang)
-                    else:
-                        title_to_show = post["title"]
 
-                    logger.info(f"发现新匹配: {title_to_show}")
+                enable_trans = self.config["settings"].get("enable_translation", False)
+                if enable_trans:
+                    target_lang = self.config["settings"].get("translation_target_lang", "zh-CN")
+                    title_to_show = self.translate_text(post["title"], target_lang)
+                else:
+                    title_to_show = post["title"]
 
-                    msg = (
-                        f"🔔 *Reddit Monitor*\n"
-                        f"📌 *{post['source']}*\n"
-                        f"📝 {title_to_show}\n"
-                        f"👤 Author: u/{post.get('author', 'unknown')}\n"
-                        f"🔗 [Link]({post['url']})"
-                    )
+                logger.info(f"发现新匹配: {title_to_show}")
 
-                    self.send_telegram(msg)
+                msg = (
+                    f"🔔 *Reddit Monitor*\n"
+                    f"📌 *{post['source']}*\n"
+                    f"📝 {title_to_show}\n"
+                    f"🕐 {post.get('created_utc', '')}\n"
+                    f"🏷️ {post.get('link_flair_text', 'N/A')}\n"
+                    f"👤 Author: u/{post.get('author', 'unknown')}\n"
+                    f"🔗 [Link]({post['url']})"
+                )
 
-                    self.save_post(post_id, post["title"], subreddit_name)
+                self.send_telegram(msg)
+
+                self.save_post(post_id, post["title"], subreddit_name)
+                logger.info(f"已保存: {post_id}")
 
         except Exception as e:
             logger.error(f"处理 r/{subreddit_name} 时出错: {e}")
@@ -307,7 +317,10 @@ class RedditMonitor:
                     )
                     delay = random.randint(MIN_DELAY, MAX_DELAY)
                     logger.info(f"处理完 r/{sub['subreddit']}，随机延迟 {delay} 秒...")
-                    width = os.get_terminal_size().columns or 40
+                    try:
+                        width = os.get_terminal_size().columns or 40
+                    except OSError:
+                        width = 40
                     logger.info("-" * (width - 34))
                     time.sleep(delay)
 
