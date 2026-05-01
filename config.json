@@ -1,0 +1,44 @@
+{
+  "telegram": {
+    "bot_token": "8502137536:AAFx6CnFxxxxxxxxxxxxxxxxx",
+    "chat_id": "-52997760xx"
+  },
+  "settings": {
+    "check_interval_seconds": 21600,
+    "max_history_records": 100000,
+    "enable_translation": true,
+    "translation_target_lang": "zh-CN"
+  },
+  "subscriptions": [
+    {
+      "subreddit": "commandline",
+      "keywords": [],
+      "category": "new"
+    },
+    {
+      "subreddit": "CLI",
+      "keywords": [],
+      "category": "new"
+    },
+    {
+      "subreddit": "tui",
+      "keywords": [],
+      "category": "new"
+    },
+    {
+      "subreddit": "bash",
+      "keywords": [],
+      "category": "new"
+    },
+    {
+      "subreddit": "SideProject",
+      "keywords": [],
+      "category": "new"
+    },
+    {
+      "subreddit": "wallpapers",
+      "keywords": [],
+      "category": "new"
+    }
+  ]
+}
