@@ -2,7 +2,6 @@
 import signal
 import sys
 from urllib import request, error
-from urllib import request, error
 import json
 import sqlite3
 import time
