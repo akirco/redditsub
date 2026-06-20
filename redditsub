@@ -19,8 +19,6 @@ MIN_DELAY = 30
 MAX_DELAY = 60
 ERROR_RETRY_DELAY = 60
 CLEANUP_INTERVAL = 10
-
-
 def adapt_datetime(dt: datetime) -> str:
     return dt.isoformat()
 
@@ -28,7 +26,7 @@ def adapt_datetime(dt: datetime) -> str:
 sqlite3.register_adapter(datetime, adapt_datetime)
 
 
-def reddit(subreddit: str, limit: int = 20, sort: str = "hot") -> Union[List[Dict[str, Any]], Dict[str, str]]:
+def reddit(subreddit: str, limit: int = 20, sort: str = "hot", cookie: str = "") -> Union[List[Dict[str, Any]], Dict[str, str]]:
     if limit < 20:
         limit = 20
     elif limit > 100:
@@ -47,6 +45,8 @@ def reddit(subreddit: str, limit: int = 20, sort: str = "hot") -> Union[List[Dic
         "Accept": "application/json",
         "Accept-Language": "en-US,en;q=0.9",
     }
+    if cookie:
+        headers["Cookie"] = cookie
 
     try:
         req = request.Request(url, headers=headers)
@@ -112,6 +112,7 @@ DEFAULT_CONFIG = {
         "enable_translation": False,
         "translation_target_lang": "zh-CN"
     },
+    "cookie": "",
     "telegram": {
         "bot_token": "",
         "chat_id": ""
@@ -238,7 +239,8 @@ class RedditMonitor:
     def process_submissions(self, subreddit_name: str, keywords: Optional[List[str]], category: str = "new", link_flair_filter: Optional[List[str]] = None) -> None:
         logger.info(f"正在检查 r/{subreddit_name} ({category})...")
         try:
-            posts = reddit(subreddit_name, limit=20, sort=category)
+            cookie = self.config.get("cookie", "")
+            posts = reddit(subreddit_name, limit=20, sort=category, cookie=cookie)
 
             if isinstance(posts, dict) and "error" in posts:
                 logger.error(f"获取帖子失败: {posts['error']}")

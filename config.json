@@ -3,6 +3,7 @@
     "bot_token": "8502137536:AAFx6CnFxxxxxxxxxxxxxxxxx",
     "chat_id": "-52997760xx"
   },
+  "cookie": "loid=xxxx",
   "settings": {
     "check_interval_seconds": 21600,
     "max_history_records": 100000,
